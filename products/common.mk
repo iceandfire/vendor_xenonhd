@@ -1,3 +1,7 @@
+# SaberMod Optimizations
+include vendor/xenonhd/configs/sm.mk
+include vendor/xenonhd/products/sm_opti.mk
+
 # Generic product
 PRODUCT_NAME := xenonhd
 PRODUCT_BRAND := xenonhd
@@ -5,6 +9,80 @@ PRODUCT_DEVICE := generic
 
 # Common overlay
 PRODUCT_PACKAGE_OVERLAYS += vendor/xenonhd/overlay/common
+
+PRODUCT_PACKAGES += \
+    AudioFX \
+    BluetoothExt \
+    CMFileManager \
+    DeskClock \
+    Development \
+    Dialer \
+    Eleven \
+    LatinImeDictionaryPack \
+    libemoji \
+    libscreenrecorder \
+    LockClock \
+    ScreenRecorder \
+    SlimLauncher \
+    SoundRecorder \
+    Torch \
+    VoicePlus \
+    KernelTweaker \
+    XenonWallpapers
+
+# CM Hardware Abstraction Framework
+PRODUCT_PACKAGES += \
+    org.cyanogenmod.hardware \
+    org.cyanogenmod.hardware.xml
+
+#Extras
+PRODUCT_PACKAGES += \
+    procmem \
+    procrank
+
+# Openssh
+PRODUCT_PACKAGES += \
+    libssh \
+    scp \
+    sftp \
+    ssh \
+    sshd \
+    sshd_config \
+    ssh-keygen \
+    start-ssh
+
+# Extra tools in XenonHD
+PRODUCT_PACKAGES += \
+    libsepol \
+    openvpn \
+    e2fsck \
+    mke2fs \
+    tune2fs \
+    bash \
+    nano \
+    htop \
+    powertop \
+    lsof \
+    mount.exfat \
+    fsck.exfat \
+    mkfs.exfat \
+    mkfs.f2fs \
+    fsck.f2fs \
+    fibmap.f2fs \
+    ntfsfix \
+    ntfs-3g \
+    gdbserver \
+    micro_bench \
+    oprofiled \
+    sqlite3 \
+    strace
+
+# Stagefright FFMPEG plugin
+PRODUCT_PACKAGES += \
+    libstagefright_soft_ffmpegadec \
+    libstagefright_soft_ffmpegvdec \
+    libFFmpegExtractor \
+    libnamparser
 
 PRODUCT_PROPERTY_OVERRIDES += \
     ro.url.legal=http://www.google.com/intl/%s/mobile/android/basic/phone-legal.html \
@@ -15,54 +93,63 @@ PRODUCT_PROPERTY_OVERRIDES += \
     ro.com.google.locationfeatures=1 \
     ro.setupwizard.mode=OPTIONAL \
     ro.setupwizard.enterprise_mode=1 \
-    windowsmgr.max_events_per_sec=240 \
     ro.media.enc.jpeg.quality=100 \
     ro.media.dec.jpeg.memcap=8000000 \
     ro.media.enc.hprof.vid.bps=8000000 \
-    wifi.supplicant_scan_interval=180
+    wifi.supplicant_scan_interval=180 \
+    ro.ril.disable.power.collapse=1 \
+    pm.sleep_mode=1 \
+    dalvik.vm.image-dex2oat-filter=everything \
+    dalvik.vm.dex2oat-filter=everything
+
+PRODUCT_PROPERTY_OVERRIDES += \
+    ro.build.selinux=1
+
+# Audio
+$(call inherit-product-if-exists, frameworks/base/data/sounds/OldAudio.mk)
+$(call inherit-product-if-exists, frameworks/base/data/sounds/NewAudio.mk)
+$(call inherit-product-if-exists, frameworks/base/data/sounds/AudioPackageStars.mk)
+$(call inherit-product-if-exists, frameworks/base/data/sounds/AudioPackageNewWave.mk)
+$(call inherit-product-if-exists, frameworks/base/data/sounds/AudioPackageElements.mk)
+$(call inherit-product-if-exists, frameworks/base/data/sounds/AudioPackage8.mk)
+$(call inherit-product-if-exists, frameworks/base/data/sounds/AudioPackage9.mk)
+$(call inherit-product-if-exists, frameworks/base/data/sounds/AudioPackage10.mk)
+$(call inherit-product-if-exists, frameworks/base/data/sounds/AudioPackage11.mk)
+$(call inherit-product-if-exists, frameworks/base/data/sounds/AudioPackage12.mk)
+$(call inherit-product-if-exists, frameworks/base/data/sounds/AudioPackage12_48.mk)
+
+# Enable ADB authentication and root
+ifneq ($(TARGET_BUILD_VARIANT),eng)
+ADDITIONAL_DEFAULT_PROPERTIES += \
+    ro.adb.secure=0 \
+    ro.secure=0 \
+    persist.sys.root_access=1
+endif
+
+# Common dictionaries
+PRODUCT_PACKAGE_OVERLAYS += vendor/xenonhd/overlay/dictionaries
 
 # Blobs common to all devices
 PRODUCT_COPY_FILES += \
-    vendor/xenonhd/proprietary/common/app/Microbes.apk:system/app/Microbes.apk \
-    vendor/xenonhd/proprietary/common/app/Superuser.apk:system/app/Superuser.apk \
-    vendor/xenonhd/proprietary/common/etc/resolv.conf:system/etc/resolv.conf \
-    vendor/xenonhd/proprietary/common/etc/hosts:system/etc/hosts \
-    vendor/xenonhd/proprietary/common/etc/liberty.bsh:system/etc/liberty.bsh \
-    vendor/xenonhd/proprietary/common/etc/liberty.cfg:system/etc \
-    vendor/xenonhd/proprietary/common/etc/audio_effects.conf:system/etc/audio_effects.conf \
-    vendor/xenonhd/proprietary/common/lib/soundfx/libcyanogen-dsp.so:system/lib/soundfx/libcyanogen-dsp.so \
-    vendor/xenonhd/proprietary/common/vendor/etc/audio_effects.conf:system/vendor/etc/audio_effects.conf \
-    vendor/xenonhd/proprietary/common/lib/libmicrobes_jni.so:system/lib/libmicrobes_jni.so
-        
+    vendor/xenonhd/proprietary/common/etc/resolv.conf:system/etc/resolv.conf
+
 # init.d support
 PRODUCT_COPY_FILES += \
-    vendor/xenonhd/proprietary/common/etc/init.d/00check:system/etc/init.d/00check \
-    vendor/xenonhd/proprietary/common/etc/init.d/01zipalign:system/etc/init.d/01zipalign \
+    vendor/xenonhd/proprietary/common/etc/init.local.rc:root/init.xenonhd.rc \
     vendor/xenonhd/proprietary/common/etc/init.d/03firstboot:system/etc/init.d/03firstboot \
     vendor/xenonhd/proprietary/common/etc/init_trigger.enabled:system/etc/init_trigger.enabled \
+    vendor/xenonhd/proprietary/common/lib/libjni_latinimegoogle.so:system/lib/libjni_latinimegoogle.so \
     vendor/xenonhd/proprietary/common/bin/sysinit:system/bin/sysinit
-    
-# Cron schedual 
-#PRODUCT_COPY_FILES += \
-#    vendor/xenonhd/proprietary/common/etc/cron/cron.conf:system/etc/cron/cron.conf \
-#    vendor/xenonhd/proprietary/common/etc/cron/cron.hourly/00drop_caches:system/etc/cron/cron.hourly/00drop_caches \
-#    vendor/xenonhd/proprietary/common/etc/cron/cron.daily/00drop_caches:system/etc/cron/cron.daily/00drop_caches \
-#    vendor/xenonhd/proprietary/common/etc/cron/cron.weekly/00drop_caches:system/etc/cron/cron.weekly/00drop_caches \
-#    vendor/xenonhd/proprietary/common/etc/cron/cron.hourly/01clear_cache:system/etc/cron/cron.hourly/01clear_cache \
-#    vendor/xenonhd/proprietary/common/etc/cron/cron.daily/01clear_cache:system/etc/cron/cron.daily/01clear_cache \
-#    vendor/xenonhd/proprietary/common/etc/cron/cron.weekly/01clear_cache:system/etc/cron/cron.weekly/01clear_ca
-    
+
+# SELinux filesystem labels
+PRODUCT_COPY_FILES += \
+    vendor/xenonhd/proprietary/common/etc/init.d/50selinuxrelabel:system/etc/init.d/50selinuxrelabel
+
 # Term info for nano support
 PRODUCT_COPY_FILES += \
     vendor/xenonhd/proprietary/common/etc/terminfo/l/linux:system/etc/terminfo/l/linux \
     vendor/xenonhd/proprietary/common/etc/terminfo/u/unknown:system/etc/terminfo/u/unknown
-    
-# Compcache/Zram support
-PRODUCT_COPY_FILES += \
-    vendor/xenonhd/proprietary/common/etc/init.local.rc:system/etc/init.local.rc \
-    vendor/xenonhd/proprietary/common/bin/compcache:system/bin/compcache \
-    vendor/xenonhd/proprietary/common/bin/handle_compcache:system/bin/handle_compcache
-    
+
 # Added xbin files
 PRODUCT_COPY_FILES += \
     vendor/xenonhd/proprietary/common/xbin/backup:system/xbin/backup \
@@ -78,46 +165,30 @@ PRODUCT_COPY_FILES += \
     vendor/xenonhd/proprietary/common/xbin/sysro:system/xbin/sysro \
     vendor/xenonhd/proprietary/common/xbin/sysrw:system/xbin/sysrw \
     vendor/xenonhd/proprietary/common/xbin/zip:system/xbin/zip \
-    vendor/xenonhd/proprietary/common/xbin/su:system/xbin/su \
     vendor/xenonhd/proprietary/common/xbin/zipalign:system/xbin/zipalign
 
-# 4.2 Keyboard
-PRODUCT_COPY_FILES +=  \
-    vendor/xenonhd/proprietary/common/app/LatinIME.apk:system/app/LatinIME.apk \
-    vendor/xenonhd/proprietary/common/lib/libjni_latinimegoogle.so:system/lib/libjni_latinimegoogle.so
-
-# JB 4.2 Camera
-PRODUCT_COPY_FILES +=  \
-    vendor/xenonhd/proprietary/common/app/GmsCore.apk:system/app/GmsCore.apk \
-    vendor/xenonhd/proprietary/common/app/Gallery2.apk:system/app/Gallery2.apk \
-    vendor/xenonhd/proprietary/common/lib/libjni_filtershow_filters.so:system/lib/libjni_filtershow_filters.so \
-    vendor/xenonhd/proprietary/common/lib/libjni_mosaic.so:system/lib/libjni_mosaic.so \
-    vendor/xenonhd/proprietary/common/lib/liblightcycle.so:system/lib/liblightcycle.so
-
-ifeq ($(TARGET_BUILD_VARIANT),userdebug)
-# Blobs common to all devices except emulator
+# AdAway
 PRODUCT_COPY_FILES += \
-    
-endif
+    vendor/xenonhd/proprietary/common/app/org.adaway.apk:system/app/org.adaway.apk
 
-ifneq ($(filter xenonhd_crespo xenonhd_crespo4g xenonhd_maguro xenonhd_toro,$(TARGET_PRODUCT)),)
-# Blobs common to all devices except emulator and tablets
+# BitSyko Layers
 PRODUCT_COPY_FILES += \
-    vendor/xenonhd/proprietary/common/app/CarHome.apk:system/app/CarHome.apk \
-    vendor/xenonhd/proprietary/common/app/GenieWidget.apk:system/app/GenieWidget.apk
-endif
+    vendor/xenonhd/proprietary/common/app/com.lovejoy777.rroandlayersmanager.apk:system/app/com.lovejoy777.rroandlayersmanager/base.apk
 
-# T-Mobile theme engine
-PRODUCT_PACKAGES += \
-       ThemeManager \
-       ThemeChooser \
-       com.tmobile.themes
-
+# SuperSU
 PRODUCT_COPY_FILES += \
-       vendor/xenonhd/proprietary/common/etc/permissions/com.tmobile.software.themes.xml:system/etc/permissions/com.tmobile.software.themes.xml
-
+     vendor/xenonhd/proprietary/common/app/UPDATE-SuperSU.zip:system/addon.d/UPDATE-SuperSU.zip \
+     vendor/xenonhd/proprietary/common/etc/init.d/99SuperSUDaemon:system/etc/init.d/99SuperSUDaemon
 
 # Enable SIP+VoIP on all targets
 PRODUCT_COPY_FILES += \
-    frameworks/base/data/etc/android.software.sip.voip.xml:system/etc/permissions/android.software.sip.voip.xml
+    frameworks/native/data/etc/android.software.sip.voip.xml:system/etc/permissions/android.software.sip.voip.xml
 
+# Camera shutter sound property
+PRODUCT_PROPERTY_OVERRIDES += \
+    persist.sys.camera-sound=1
+
+
+ifeq ($(PRODUCT_PREBUILT_WEBVIEWCHROMIUM), yes)
+    -include prebuilts/chromium/$(TARGET_DEVICE)/chromium_prebuilt.mk
+endif
